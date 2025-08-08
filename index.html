@@ -1,0 +1,1112 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CS2 Autoexec Config - Arch Linux Terminal</title>
+    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@300;400;500;600;700&family=Source+Code+Pro:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --arch-blue: #1793d1;
+            --arch-blue-dark: #0f7bb3;
+            --arch-blue-light: #3ba3da;
+            --terminal-bg: #1e1e1e;
+            --terminal-bg-alt: #2d2d2d;
+            --terminal-bg-card: rgba(45, 45, 45, 0.85);
+            --terminal-border: #404040;
+            --text-primary: #ffffff;
+            --text-secondary: #b3b3b3;
+            --text-muted: #666666;
+            --text-accent: #87ceeb;
+            --success: #50fa7b;
+            --warning: #f1fa8c;
+            --error: #ff5555;
+            --shadow: rgba(0, 0, 0, 0.3);
+            --glow-blue: rgba(23, 147, 209, 0.3);
+        }
+
+        html {
+            height: 100%;
+            scroll-behavior: smooth;
+        }
+
+        body {
+            font-family: 'JetBrains Mono', 'Source Code Pro', monospace;
+            background: var(--terminal-bg);
+            color: var(--text-primary);
+            min-height: 100vh;
+            overflow-x: hidden;
+            position: relative;
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* Mountain background */
+        .background {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: 
+                linear-gradient(rgba(30, 30, 30, 0.7), rgba(30, 30, 30, 0.8)),
+                url('https://images.pexels.com/photos/933054/pexels-photo-933054.jpeg?auto=compress&cs=tinysrgb&w=1920&h=1080&fit=crop') center/cover no-repeat;
+            filter: blur(2px);
+            z-index: -2;
+        }
+
+        /* Terminal boot loading */
+        .loading-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: var(--terminal-bg);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 10000;
+            animation: fadeOut 0.8s ease-out 2.5s forwards;
+        }
+
+        .boot-sequence {
+            font-family: 'JetBrains Mono', monospace;
+            color: var(--text-secondary);
+            text-align: left;
+            font-size: 14px;
+            line-height: 1.6;
+            max-width: 600px;
+        }
+
+        .boot-line {
+            opacity: 0;
+            animation: typeIn 0.05s ease-out forwards;
+            white-space: nowrap;
+            overflow: hidden;
+        }
+
+        .boot-line.system { color: var(--arch-blue); }
+        .boot-line.ok { color: var(--success); }
+        .boot-line.warning { color: var(--warning); }
+
+        @keyframes typeIn {
+            to { opacity: 1; }
+        }
+
+        @keyframes fadeOut {
+            to {
+                opacity: 0;
+                visibility: hidden;
+            }
+        }
+
+        /* Main container */
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px;
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* Header */
+        header {
+            padding: 40px 0;
+            position: relative;
+        }
+
+        .terminal-window {
+            background: var(--terminal-bg-card);
+            border: 2px solid var(--terminal-border);
+            border-radius: 8px;
+            padding: 20px;
+            backdrop-filter: blur(20px);
+            box-shadow: 0 10px 30px var(--shadow);
+            position: relative;
+            animation: slideDown 1s ease-out;
+        }
+
+        @keyframes slideDown {
+            from {
+                opacity: 0;
+                transform: translateY(-50px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .window-controls {
+            display: flex;
+            gap: 8px;
+            margin-bottom: 15px;
+        }
+
+        .control-btn {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+        }
+
+        .control-btn.close { background: #ff5f56; }
+        .control-btn.minimize { background: #ffbd2e; }
+        .control-btn.maximize { background: #27ca3f; }
+
+        .terminal-header {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 20px;
+            padding-bottom: 10px;
+            border-bottom: 1px solid var(--terminal-border);
+        }
+
+        .arch-logo {
+            color: var(--arch-blue);
+            font-size: 18px;
+            font-weight: 600;
+        }
+
+        .terminal-path {
+            color: var(--text-secondary);
+            font-size: 14px;
+        }
+
+        h1 {
+            font-size: 2.5rem;
+            font-weight: 600;
+            color: var(--arch-blue);
+            margin-bottom: 10px;
+            text-shadow: 0 0 20px var(--glow-blue);
+            animation: glow 3s ease-in-out infinite alternate;
+        }
+
+        @keyframes glow {
+            from { text-shadow: 0 0 20px var(--glow-blue); }
+            to { text-shadow: 0 0 30px var(--glow-blue), 0 0 40px var(--glow-blue); }
+        }
+
+        .subtitle {
+            color: var(--text-secondary);
+            font-size: 1.1rem;
+            font-weight: 300;
+        }
+
+        .command-prompt {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-top: 15px;
+            font-size: 14px;
+        }
+
+        .prompt-symbol {
+            color: var(--success);
+        }
+
+        .prompt-user {
+            color: var(--arch-blue);
+        }
+
+        .prompt-path {
+            color: var(--text-accent);
+        }
+
+        .cursor {
+            display: inline-block;
+            width: 8px;
+            height: 18px;
+            background: var(--text-primary);
+            animation: blink 1s infinite;
+        }
+
+        @keyframes blink {
+            0%, 50% { opacity: 1; }
+            51%, 100% { opacity: 0; }
+        }
+
+        /* Download section */
+        .download-section {
+            background: var(--terminal-bg-card);
+            border: 1px solid var(--terminal-border);
+            border-radius: 8px;
+            padding: 30px;
+            margin: 30px 0;
+            backdrop-filter: blur(20px);
+            box-shadow: 0 5px 20px var(--shadow);
+            animation: slideUp 1s ease-out 0.3s both;
+        }
+
+        @keyframes slideUp {
+            from {
+                opacity: 0;
+                transform: translateY(50px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .download-title {
+            color: var(--text-primary);
+            font-size: 1.3rem;
+            font-weight: 500;
+            margin-bottom: 15px;
+        }
+
+        .download-desc {
+            color: var(--text-secondary);
+            margin-bottom: 20px;
+            line-height: 1.6;
+        }
+
+        .install-button {
+            background: linear-gradient(135deg, var(--arch-blue), var(--arch-blue-dark));
+            border: 2px solid var(--arch-blue);
+            color: white;
+            padding: 12px 30px;
+            font-size: 14px;
+            font-weight: 500;
+            font-family: inherit;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: all 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+            position: relative;
+            overflow: hidden;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .install-button::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+            transition: left 0.6s;
+        }
+
+        .install-button:hover {
+            background: linear-gradient(135deg, var(--arch-blue-light), var(--arch-blue));
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px var(--glow-blue);
+        }
+
+        .install-button:hover::before {
+            left: 100%;
+        }
+
+        .install-button:active {
+            transform: translateY(0);
+        }
+
+        /* Tabs */
+        .tabs {
+            background: var(--terminal-bg-card);
+            border: 1px solid var(--terminal-border);
+            border-radius: 8px 8px 0 0;
+            display: flex;
+            margin: 40px 0 0 0;
+            backdrop-filter: blur(20px);
+            animation: slideUp 1s ease-out 0.5s both;
+        }
+
+        .tab {
+            background: transparent;
+            border: none;
+            color: var(--text-secondary);
+            padding: 15px 25px;
+            cursor: pointer;
+            font-family: inherit;
+            font-size: 14px;
+            font-weight: 500;
+            border-right: 1px solid var(--terminal-border);
+            transition: all 0.3s ease;
+            position: relative;
+        }
+
+        .tab:last-child {
+            border-right: none;
+        }
+
+        .tab.active {
+            color: var(--arch-blue);
+            background: var(--terminal-bg);
+        }
+
+        .tab.active::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            height: 2px;
+            background: var(--arch-blue);
+        }
+
+        .tab:hover:not(.active) {
+            color: var(--text-primary);
+            background: rgba(255, 255, 255, 0.05);
+        }
+
+        /* Content */
+        .content-wrapper {
+            background: var(--terminal-bg-card);
+            border: 1px solid var(--terminal-border);
+            border-top: none;
+            border-radius: 0 0 8px 8px;
+            min-height: 400px;
+            backdrop-filter: blur(20px);
+            position: relative;
+            flex: 1;
+        }
+
+        .content-panel {
+            opacity: 0;
+            transform: translateX(20px);
+            transition: all 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+            position: absolute;
+            width: 100%;
+            padding: 30px;
+            pointer-events: none;
+        }
+
+        .content-panel.active {
+            opacity: 1;
+            transform: translateX(0);
+            position: relative;
+            pointer-events: auto;
+        }
+
+        .section {
+            margin-bottom: 30px;
+        }
+
+        .section h2 {
+            color: var(--arch-blue);
+            font-size: 1.5rem;
+            font-weight: 600;
+            margin-bottom: 15px;
+            border-left: 3px solid var(--arch-blue);
+            padding-left: 15px;
+        }
+
+        .section h3 {
+            color: var(--text-primary);
+            font-size: 1.2rem;
+            font-weight: 500;
+            margin: 20px 0 10px;
+        }
+
+        .section p {
+            color: var(--text-secondary);
+            line-height: 1.6;
+            margin-bottom: 10px;
+        }
+
+        /* Code block */
+        .code-terminal {
+            background: var(--terminal-bg);
+            border: 2px solid var(--terminal-border);
+            border-radius: 6px;
+            margin: 20px 0;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .code-header {
+            background: var(--terminal-bg-alt);
+            padding: 10px 20px;
+            border-bottom: 1px solid var(--terminal-border);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .code-title {
+            color: var(--text-secondary);
+            font-size: 12px;
+        }
+
+        .copy-btn {
+            background: var(--arch-blue);
+            border: none;
+            color: white;
+            padding: 4px 12px;
+            font-size: 11px;
+            font-family: inherit;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .copy-btn:hover {
+            background: var(--arch-blue-light);
+            transform: scale(1.05);
+        }
+
+        .code-content {
+            padding: 20px;
+            font-size: 13px;
+            line-height: 1.6;
+            overflow-x: auto;
+        }
+
+        /* Syntax highlighting */
+        .keyword { color: #569cd6; font-weight: 600; }
+        .string { color: var(--success); }
+        .comment { color: var(--text-muted); font-style: italic; }
+        .variable { color: var(--text-accent); }
+        .number { color: #b5cea8; }
+
+        .config-line {
+            display: block;
+            padding: 6px 12px;
+            margin: 2px 0;
+            border-radius: 4px;
+            transition: all 0.3s ease;
+            cursor: help;
+        }
+
+        .config-line:hover {
+            background: rgba(23, 147, 209, 0.1);
+            border-left: 3px solid var(--arch-blue);
+            transform: translateX(5px);
+        }
+
+        /* Features */
+        .feature-list {
+            list-style: none;
+        }
+
+        .feature-item {
+            display: flex;
+            align-items: flex-start;
+            padding: 20px 0;
+            border-bottom: 1px solid var(--terminal-border);
+            transition: all 0.3s ease;
+        }
+
+        .feature-item:last-child {
+            border-bottom: none;
+        }
+
+        .feature-item:hover {
+            background: rgba(255, 255, 255, 0.02);
+            transform: translateX(5px);
+            border-radius: 8px;
+            padding: 20px 15px;
+        }
+
+        .feature-icon {
+            color: var(--arch-blue);
+            font-size: 18px;
+            margin-right: 15px;
+            min-width: 25px;
+        }
+
+        .feature-content h3 {
+            color: var(--text-primary);
+            font-size: 1rem;
+            margin: 0 0 8px 0;
+        }
+
+        .feature-bind {
+            background: var(--terminal-bg);
+            color: var(--warning);
+            font-size: 11px;
+            padding: 2px 8px;
+            border-radius: 4px;
+            display: inline-block;
+            margin-bottom: 8px;
+            font-family: inherit;
+        }
+
+        .feature-desc {
+            color: var(--text-secondary);
+            margin: 0;
+            font-size: 14px;
+        }
+
+        /* Steps */
+        .step {
+            background: rgba(23, 147, 209, 0.05);
+            border-left: 4px solid var(--arch-blue);
+            padding: 20px;
+            margin: 15px 0;
+            border-radius: 0 6px 6px 0;
+            transition: all 0.3s ease;
+        }
+
+        .step:hover {
+            background: rgba(23, 147, 209, 0.1);
+            transform: translateX(5px);
+        }
+
+        /* Warning */
+        .warning {
+            background: rgba(241, 250, 140, 0.1);
+            border: 1px solid rgba(241, 250, 140, 0.3);
+            border-radius: 6px;
+            padding: 15px;
+            margin: 15px 0;
+            color: var(--warning);
+        }
+
+        .path-highlight {
+            background: rgba(135, 206, 235, 0.2);
+            color: var(--text-accent);
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-family: inherit;
+            font-size: 0.9em;
+        }
+
+        /* Tooltip */
+        .tooltip {
+            position: fixed;
+            background: rgba(45, 45, 45, 0.95);
+            color: var(--text-primary);
+            padding: 12px 16px;
+            border-radius: 6px;
+            font-size: 12px;
+            border: 1px solid var(--arch-blue);
+            z-index: 10000;
+            max-width: 400px;
+            backdrop-filter: blur(20px);
+            box-shadow: 0 10px 30px var(--shadow);
+            opacity: 0;
+            transform: translateY(10px);
+            transition: all 0.3s ease;
+            pointer-events: none;
+            line-height: 1.5;
+        }
+
+        .tooltip.show {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        /* Footer */
+        footer {
+            background: var(--terminal-bg-card);
+            border-top: 1px solid var(--terminal-border);
+            padding: 30px 0;
+            text-align: center;
+            color: var(--text-secondary);
+            backdrop-filter: blur(20px);
+            margin-top: auto;
+        }
+
+        footer p {
+            margin: 8px 0;
+            font-size: 14px;
+        }
+
+        .footer-arch {
+            color: var(--arch-blue);
+            font-weight: 600;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .container {
+                padding: 0 15px;
+            }
+            
+            h1 {
+                font-size: 2rem;
+            }
+            
+            .tabs {
+                flex-direction: column;
+            }
+            
+            .tab {
+                border-right: none;
+                border-bottom: 1px solid var(--terminal-border);
+            }
+            
+            .tab:last-child {
+                border-bottom: none;
+            }
+            
+            .content-panel {
+                padding: 20px 15px;
+            }
+            
+            .section {
+                padding: 15px;
+            }
+            
+            .feature-item {
+                flex-direction: column;
+                text-align: left;
+            }
+            
+            .feature-icon {
+                margin: 0 0 10px 0;
+            }
+        }
+
+        /* Custom scrollbar */
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: var(--terminal-bg);
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: var(--arch-blue);
+            border-radius: 4px;
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: var(--arch-blue-light);
+        }
+    </style>
+</head>
+<body>
+    <!-- Background -->
+    <div class="background"></div>
+
+    <!-- Loading overlay -->
+    <div class="loading-overlay">
+        <div class="boot-sequence">
+            <div class="boot-line system">[    0.000000] Arch Linux booting...</div>
+            <div class="boot-line">[    0.234567] Loading CS2 configuration modules...</div>
+            <div class="boot-line ok">[    OK    ] Started CS2 Autoexec Service</div>
+            <div class="boot-line">[    0.456789] Mounting movement binds...</div>
+            <div class="boot-line ok">[    OK    ] Reached target Multi-User System</div>
+            <div class="boot-line">[    0.678901] Starting terminal interface...</div>
+            <div class="boot-line system">[    INFO  ] Terminal ready. Welcome to Arch Linux.</div>
+        </div>
+    </div>
+
+    <div class="container">
+        <header>
+            <div class="terminal-window">
+                <div class="window-controls">
+                    <div class="control-btn close"></div>
+                    <div class="control-btn minimize"></div>
+                    <div class="control-btn maximize"></div>
+                </div>
+                <div class="terminal-header">
+                    <span class="arch-logo">󰣇</span>
+                    <span class="terminal-path">cs2-config@archlinux</span>
+                </div>
+                <h1>CS2 Autoexec Configuration</h1>
+                <p class="subtitle">Advanced movement binds and optimization for Counter-Strike 2</p>
+                <div class="command-prompt">
+                    <span class="prompt-symbol">❯</span>
+                    <span class="prompt-user">user</span>
+                    <span class="prompt-symbol">@</span>
+                    <span class="prompt-user">archlinux</span>
+                    <span class="prompt-symbol">:</span>
+                    <span class="prompt-path">~/cs2-config</span>
+                    <span class="prompt-symbol">$</span>
+                    <span class="cursor"></span>
+                </div>
+            </div>
+        </header>
+
+        <div class="download-section">
+            <h2 class="download-title">📦 Install Configuration Package</h2>
+            <p class="download-desc">Download the complete CS2 autoexec package with movement optimizations and advanced bindings.</p>
+            <a href="https://github.com/your-username/cs2-config/releases/latest" class="install-button" target="_blank">
+                <span>🔗</span> Download from GitHub
+            </a>
+        </div>
+
+        <div class="tabs">
+            <button class="tab active" onclick="showTab('overview', this)">./overview</button>
+            <button class="tab" onclick="showTab('config', this)">cat autoexec.cfg</button>
+            <button class="tab" onclick="showTab('installation', this)">./install.sh</button>
+            <button class="tab" onclick="showTab('features', this)">ls features/</button>
+        </div>
+
+        <div class="content-wrapper">
+            <div id="overview" class="content-panel active">
+                <div class="section">
+                    <h2>📋 System Information</h2>
+                    <p><strong>Package:</strong> cs2-autoexec-config</p>
+                    <p><strong>Version:</strong> 2.1.0-1</p>
+                    <p><strong>Architecture:</strong> any</p>
+                    <p><strong>Maintainer:</strong> CS2 Community</p>
+                    <p><strong>Description:</strong> Advanced Counter-Strike 2 autoexec configuration with movement optimizations</p>
+                    
+                    <h3>📄 Package Contents</h3>
+                    <p>This configuration includes specialized bindings for bunnyhopping, edge-bugging, noclip toggles, and various quality-of-life improvements for CS2 practice and gameplay.</p>
+
+                    <div class="warning">
+                        <strong>⚠️ Notice:</strong> Some features require <code>sv_cheats 1</code> and are intended for practice servers and offline use only.
+                    </div>
+
+                    <h3>🏔️ Dependencies</h3>
+                    <ul style="color: var(--text-secondary); margin-left: 20px;">
+                        <li>Counter-Strike 2</li>
+                        <li>Steam Client</li>
+                        <li>Optional: Practice server with sv_cheats enabled</li>
+                    </ul>
+                </div>
+            </div>
+
+            <div id="config" class="content-panel">
+                <div class="section">
+                    <h2>📝 Configuration File</h2>
+                    <p>Complete autoexec.cfg source code. Hover over lines for detailed explanations.</p>
+                    
+                    <div class="code-terminal">
+                        <div class="code-header">
+                            <span class="code-title">~/cs2-config/autoexec.cfg</span>
+                            <button class="copy-btn" onclick="copyToClipboard(this)">Copy</button>
+                        </div>
+                        <div class="code-content">
+                            <pre id="config-content"></pre>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div id="installation" class="content-panel">
+                <div class="section">
+                    <h2>⚙️ Installation Guide</h2>
+                    
+                    <h3>Step 1: Locate CS2 Config Directory</h3>
+                    <div class="step">
+                        <p><strong>Navigate to CS2 configuration folder:</strong></p>
+                        <p>Path: <span class="path-highlight">Steam/steamapps/common/Counter-Strike Global Offensive/game/csgo/cfg/</span></p>
+                        <p>Access via: Steam → CS2 → Properties → Browse Local Files → game/csgo/cfg</p>
+                    </div>
+
+                    <h3>Step 2: Extract Configuration</h3>
+                    <div class="step">
+                        <p>1. Download the autoexec.zip file from GitHub</p>
+                        <p>2. Extract all contents to the cfg directory</p>
+                        <p>3. Ensure autoexec.cfg is directly in the cfg folder</p>
+                        <p>4. Verify movement/ directory is also present</p>
+                    </div>
+
+                    <h3>Step 3: Enable Autoexec</h3>
+                    <div class="step">
+                        <p><strong>Method 1 - Launch Options (Recommended):</strong></p>
+                        <p>Steam → CS2 → Properties → Launch Options → Add: <span class="path-highlight">+exec autoexec</span></p>
+                    </div>
+                    <div class="step">
+                        <p><strong>Method 2 - Manual Console:</strong></p>
+                        <p>In-game console (~) → <span class="path-highlight">exec autoexec</span></p>
+                    </div>
+
+                    <div class="warning">
+                        <strong>⚠️ Important:</strong> Some bindings require sv_cheats 1 enabled on the server.
+                    </div>
+                </div>
+            </div>
+
+            <div id="features" class="content-panel">
+                <div class="section">
+                    <h2>✨ Feature Overview</h2>
+
+                    <ul class="feature-list">
+                        <li class="feature-item">
+                            <span class="feature-icon">🐰</span>
+                            <div class="feature-content">
+                                <h3>Bunnyhopping Assistant</h3>
+                                <div class="feature-bind">BIND: mwheeldown + capslock</div>
+                                <p class="feature-desc">Mouse wheel jump with FPS limiting (64fps) for consistent bhop timing</p>
+                            </div>
+                        </li>
+
+                        <li class="feature-item">
+                            <span class="feature-icon">👻</span>
+                            <div class="feature-content">
+                                <h3>Noclip Toggle</h3>
+                                <div class="feature-bind">BIND: alt</div>
+                                <p class="feature-desc">Quick noclip toggle for practice sessions (requires sv_cheats 1)</p>
+                            </div>
+                        </li>
+
+                        <li class="feature-item">
+                            <span class="feature-icon">📐</span>
+                            <div class="feature-content">
+                                <h3>Edge Bug Technique</h3>
+                                <div class="feature-bind">BIND: x</div>
+                                <p class="feature-desc">Duck + FPS limit (20fps) for precise edge-bugging on ledges</p>
+                            </div>
+                        </li>
+
+                        <li class="feature-item">
+                            <span class="feature-icon">👁️</span>
+                            <div class="feature-content">
+                                <h3>Viewmodel Toggle</h3>
+                                <div class="feature-bind">BIND: v</div>
+                                <p class="feature-desc">Toggle weapon viewmodel visibility for screenshots/cleaner view</p>
+                            </div>
+                        </li>
+
+                        <li class="feature-item">
+                            <span class="feature-icon">🔊</span>
+                            <div class="feature-content">
+                                <h3>Volume Control</h3>
+                                <div class="feature-bind">BIND: numpad +/-</div>
+                                <p class="feature-desc">Quick volume adjustment using numpad keys</p>
+                            </div>
+                        </li>
+
+                        <li class="feature-item">
+                            <span class="feature-icon">⚙️</span>
+                            <div class="feature-content">
+                                <h3>Movement Tick Files</h3>
+                                <div class="feature-bind">FILES: tick0.cfg - tick10.cfg</div>
+                                <p class="feature-desc">Advanced movement timing optimization for frame-perfect techniques</p>
+                            </div>
+                        </li>
+                    </ul>
+
+                    <div class="warning">
+                        <strong>📜 Legal Notice:</strong> This configuration is for educational and practice purposes. Use responsibly and in appropriate game modes only.
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <footer>
+            <p><span class="footer-arch">󰣇 Arch Linux</span> × CS2 Configuration Terminal</p>
+            <p>Built for the Counter-Strike 2 community • Use responsibly</p>
+        </footer>
+    </div>
+
+    <!-- Tooltip -->
+    <div id="tooltip" class="tooltip"></div>
+
+    <script>
+        // Configuration data with tooltips
+        const configData = [
+            { code: 'alias +jump_ "exec +jump"', tooltip: 'Creates a jump alias for desync - helps with timing inconsistencies in movement mechanics' },
+            { code: 'alias -jump_ "exec -jump"', tooltip: 'Creates the corresponding -jump alias for desync - ensures proper jump release timing' },
+            { code: 'bind "mwheeldown" "+jump_"', tooltip: 'Binds mouse wheel down to the custom jump alias for scroll wheel jumping (essential for bhop)' },
+            { code: 'unbind "space"', tooltip: 'Removes space bar jump binding to prevent conflicts with scroll wheel and maintain consistency' },
+            { code: '', tooltip: '' },
+            { code: '// fps bug for bhop', tooltip: 'Comment section: FPS manipulation techniques for bhop consistency' },
+            { code: 'alias "+holdbh" "fps_max 64; r_cleardecals"', tooltip: 'Creates alias that limits FPS to 64 and clears decals - 64 FPS helps with bhop air acceleration consistency' },
+            { code: 'alias "-holdbh" "fps_max 400"', tooltip: 'Restores FPS to 400 when the bhop assist key is released for normal gameplay' },
+            { code: 'bind "capslock" "+holdbh" // could be space too', tooltip: 'Binds Caps Lock to bhop assist - hold while bhopping for better consistency (you still need to scroll wheel)' },
+            { code: '// THIS IS NOT AUTO BHOP, YOU WILL STILL NEED TO USE YOUR JUMP KEY TO BHOP WHILE HOLDING THIS THE KEY YOU SET JUST A LINE UP (capslock by default)', tooltip: 'Critical disclaimer: This is NOT automatic bunnyhopping - you must still scroll wheel jump while holding the FPS limit key' },
+            { code: '', tooltip: '' },
+            { code: 'alias "+nClip" "noclip"', tooltip: 'Creates noclip alias for when Alt key is pressed (enables noclip mode - requires sv_cheats 1)' },
+            { code: 'alias "-nClip" "noclip"', tooltip: 'Creates noclip alias for when Alt key is released (disables noclip mode)' },
+            { code: 'bind "alt" "+nClip"', tooltip: 'Binds Alt key to noclip toggle - press and hold Alt to enable noclip, release to disable' },
+            { code: '', tooltip: '' },
+            { code: '// eb', tooltip: 'Comment: Edge bug configuration section for pixel-perfect edge catching' },
+            { code: 'alias "+eb" "+duck; fps_max 20"', tooltip: 'Edge bug technique: duck + very low FPS (20) - low FPS helps catch edges more reliably' },
+            { code: 'alias "-eb" "-duck; fps_max 400"', tooltip: 'Releases duck and restores normal FPS when edge bug key is released' },
+            { code: 'bind "x" "+eb"', tooltip: 'Binds X key to edge bug technique - hold X while approaching edges to perform edge bugs' },
+            { code: '', tooltip: '' },
+            { code: 'sv_cheats 1', tooltip: 'Enables cheat commands (required for noclip and some other features) - only works on private servers' },
+            { code: 'exec_async movement/tick0', tooltip: 'Loads tick0 movement configuration for frame-perfect movement timing adjustments' },
+            { code: 'exec_async movement/tick1', tooltip: 'Loads tick1 movement configuration for frame-perfect movement timing adjustments' },
+            { code: 'exec_async movement/tick2', tooltip: 'Loads tick2 movement configuration for frame-perfect movement timing adjustments' },
+            { code: 'exec_async movement/tick3', tooltip: 'Loads tick3 movement configuration for frame-perfect movement timing adjustments' },
+            { code: 'exec_async movement/tick4', tooltip: 'Loads tick4 movement configuration for frame-perfect movement timing adjustments' },
+            { code: 'exec_async movement/tick5', tooltip: 'Loads tick5 movement configuration for frame-perfect movement timing adjustments' },
+            { code: 'exec_async movement/tick6', tooltip: 'Loads tick6 movement configuration for frame-perfect movement timing adjustments' },
+            { code: 'exec_async movement/tick7', tooltip: 'Loads tick7 movement configuration for frame-perfect movement timing adjustments' },
+            { code: 'exec_async movement/tick8', tooltip: 'Loads tick8 movement configuration for frame-perfect movement timing adjustments' },
+            { code: 'exec_async movement/tick9', tooltip: 'Loads tick9 movement configuration for frame-perfect movement timing adjustments' },
+            { code: 'exec_async movement/tick10', tooltip: 'Loads tick10 movement configuration for frame-perfect movement timing adjustments' },
+            { code: '', tooltip: '' },
+            { code: 'bind "kp_plus" "incrementvar volume 0 1 0.1"     // +', tooltip: 'Increases game volume by 0.1 when numpad + is pressed - quick volume adjustment during gameplay' },
+            { code: 'bind "kp_minus" "incrementvar volume 0 1 -0.1"   // -', tooltip: 'Decreases game volume by 0.1 when numpad - is pressed - quick volume adjustment during gameplay' },
+            { code: '', tooltip: '' },
+            { code: 'alias "viewmodel_toggle" "toggle r_drawviewmodel"', tooltip: 'Creates alias to toggle weapon viewmodel visibility on/off - useful for screenshots or cleaner view' },
+            { code: 'bind "v" "viewmodel_toggle"', tooltip: 'Binds V key to viewmodel toggle - press V to show/hide your weapon model' },
+            { code: '', tooltip: '' },
+            { code: 'bind "kp_1" " say "You\'re making a game and you are looking for the best anticheat? Add VAC (Valve Allows Cockeater), you will n̶o̶t̶  regret it!""', tooltip: 'Fun chat message bound to numpad 1 - sends humorous message about VAC anticheat system' },
+            { code: '', tooltip: '' },
+            { code: 'alias reset_t "alias t"', tooltip: 'Utility alias for resetting the \'t\' command binding - prevents accidental command execution' },
+            { code: 'alias t ""', tooltip: 'Clears the \'t\' alias to empty string - safety measure to prevent unwanted command execution' },
+            { code: '', tooltip: '' },
+            { code: 'con_enable "1"', tooltip: 'Enables the developer console - allows you to open console with ~ (tilde) key for command input' }
+        ];
+
+        // Enhanced syntax highlighting
+        function applySyntaxHighlighting(code) {
+            if (!code.trim()) return '';
+            
+            if (code.trim().startsWith('//')) {
+                return `<span class="comment">${code}</span>`;
+            }
+            
+            let highlighted = code;
+            const tempMarkers = [];
+            let markerIndex = 0;
+            
+            // Protect strings
+            highlighted = highlighted.replace(/"[^"]*"/g, (match) => {
+                const marker = `TEMP_STRING_${markerIndex++}`;
+                tempMarkers.push({marker, replacement: `<span class="string">${match}</span>`});
+                return marker;
+            });
+            
+            // Keywords
+            highlighted = highlighted.replace(/\b(alias|bind|unbind|exec_async|sv_cheats|con_enable|incrementvar|toggle)\b/g, 
+                '<span class="keyword">$1</span>');
+            
+            // Numbers
+            highlighted = highlighted.replace(/\b(\d+(?:\.\d+)?)\b/g, '<span class="number">$1</span>');
+            
+            // Variables and commands
+            highlighted = highlighted.replace(/\b(movement\/tick\d+|\+\w+|-\w+|viewmodel_toggle|reset_t|fps_max|r_cleardecals|r_drawviewmodel|noclip)\b/g, 
+                '<span class="variable">$1</span>');
+            
+            // End of line comments
+            highlighted = highlighted.replace(/(\s)(\/\/.*)$/, '$1<span class="comment">$2</span>');
+            
+            // Restore strings
+            tempMarkers.forEach(({marker, replacement}) => {
+                highlighted = highlighted.replace(marker, replacement);
+            });
+            
+            return highlighted;
+        }
+
+        // Generate config HTML
+        function generateConfigHTML() {
+            const configContainer = document.getElementById('config-content');
+            let html = '';
+            
+            configData.forEach((item) => {
+                if (item.code.trim() === '') {
+                    html += '<div class="config-line">&nbsp;</div>';
+                } else {
+                    const highlighted = applySyntaxHighlighting(item.code);
+                    html += `<div class="config-line" data-tooltip="${item.tooltip}">${highlighted}</div>`;
+                }
+            });
+            
+            configContainer.innerHTML = html;
+        }
+
+        // Tab system
+        function showTab(tabName, tabElement) {
+            // Remove active from all tabs
+            const tabs = document.querySelectorAll('.tab');
+            tabs.forEach(tab => tab.classList.remove('active'));
+            
+            // Hide all panels
+            const panels = document.querySelectorAll('.content-panel');
+            panels.forEach(panel => panel.classList.remove('active'));
+            
+            // Activate selected tab and panel
+            tabElement.classList.add('active');
+            setTimeout(() => {
+                document.getElementById(tabName).classList.add('active');
+            }, 100);
+        }
+
+        // Copy functionality
+        function copyToClipboard(button) {
+            const plainConfig = configData.map(item => item.code).join('\n');
+            
+            navigator.clipboard.writeText(plainConfig).then(() => {
+                const originalText = button.textContent;
+                button.textContent = '✓ Copied';
+                button.style.background = 'var(--success)';
+                
+                setTimeout(() => {
+                    button.textContent = originalText;
+                    button.style.background = '';
+                }, 2000);
+            });
+        }
+
+        // Tooltip system
+        function showTooltip(event, text) {
+            const tooltip = document.getElementById('tooltip');
+            tooltip.textContent = text;
+            tooltip.classList.add('show');
+            
+            const x = event.clientX;
+            const y = event.clientY;
+            
+            let left = x + 15;
+            let top = y + 20;
+            
+            if (left + 400 > window.innerWidth) {
+                left = x - 415;
+            }
+            if (top + 100 > window.innerHeight) {
+                top = y - 80;
+            }
+            
+            if (left < 10) left = 10;
+            if (top < 10) top = 10;
+            
+            tooltip.style.left = left + 'px';
+            tooltip.style.top = top + 'px';
+        }
+
+        function hideTooltip() {
+            const tooltip = document.getElementById('tooltip');
+            tooltip.classList.remove('show');
+        }
+
+        // Animate boot sequence
+        function animateBootSequence() {
+            const bootLines = document.querySelectorAll('.boot-line');
+            bootLines.forEach((line, index) => {
+                setTimeout(() => {
+                    line.style.animationDelay = '0s';
+                }, index * 300);
+            });
+        }
+
+        // Initialize
+        document.addEventListener('DOMContentLoaded', function() {
+            // Animate boot sequence
+            animateBootSequence();
+            
+            // Generate config with syntax highlighting
+            generateConfigHTML();
+            
+            // Setup tooltip listeners
+            setTimeout(() => {
+                const configLines = document.querySelectorAll('.config-line[data-tooltip]');
+                configLines.forEach(line => {
+                    line.addEventListener('mouseenter', function(e) {
+                        const tooltip = this.getAttribute('data-tooltip');
+                        if (tooltip && tooltip.trim()) {
+                            showTooltip(e, tooltip);
+                        }
+                    });
+                    
+                    line.addEventListener('mouseleave', hideTooltip);
+                    
+                    line.addEventListener('mousemove', function(e) {
+                        const tooltip = this.getAttribute('data-tooltip');
+                        if (tooltip && tooltip.trim() && document.getElementById('tooltip').classList.contains('show')) {
+                            showTooltip(e, tooltip);
+                        }
+                    });
+                });
+            }, 100);
+        });
+    </script>
+</body>
+</html>
